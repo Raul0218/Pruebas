@@ -3,95 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>360° Viewer with Hotspots</title>
+    <title>360° Viewer</title>
+    <script src="https://cdn.jsdelivr.net/npm/marzipano@0.10.0/dist/marzipano.js"></script>
     <style>
-        body {
-            margin: 0;
-            background-color: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-        #viewer {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .hotspot {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: blue;
-            border-radius: 50%;
-            cursor: pointer;
-            transform: translate(-50%, -50%);
-            transition: transform 0.2s;
-        }
-        .hotspot:hover {
-            transform: translate(-50%, -50%) scale(1.2);
-        }
+        body { margin: 0; }
+        #viewer { width: 100%; height: 100vh; }
     </style>
 </head>
 <body>
-    <div id="viewer">
-        <img id="panorama" src="images/0001.png" alt="Panorama">
-    </div>
-
+    <div id="viewer"></div>
     <script>
+        // Crear el visor
+        const viewerElement = document.getElementById('viewer');
+        const viewer = new Marzipano.Viewer(viewerElement);
+
+        // Crear las capas de imágenes
         const images = [
-            "images/0001.png",
-            "images/0002.png",
-            "images/0003.png",
-            "images/0004.png",
-            "images/0005.png",
-            "images/0016.png",
-            "images/0017.png",
-            "images/0018.png"
+            'images/0001.png', 'images/0002.png', 'images/0003.png',
+            'images/0004.png', 'images/0005.png', 'images/0006.png',
+            'images/0007.png', 'images/0008.png', 'images/0009.png',
+            'images/0010.png', 'images/0011.png', 'images/0012.png',
+            'images/0013.png', 'images/0014.png', 'images/0015.png',
+            'images/0016.png', 'images/0017.png', 'images/0018.png',
+            'images/0019.png', 'images/0020.png', 'images/0021.png',
+            'images/0022.png', 'images/0023.png', 'images/0024.png',
+            'images/0025.png', 'images/0026.png', 'images/0027.png',
+            'images/0028.png', 'images/0029.png', 'images/0030.png',
+            'images/0031.png', 'images/0032.png', 'images/0033.png',
+            'images/0034.png', 'images/0035.png', 'images/0036.png',
+            'images/0037.png', 'images/0038.png', 'images/0039.png',
+            'images/0040.png'
         ];
 
-        const hotspots = [
-            { imageIndex: 5, x: 1888.889, y: 1991.111, url: "https://aresperu.com.pe/puertas/laminadas-terminadas/puertas-pet/" },
-            { imageIndex: 6, x: 1817.778, y: 1991.111, url: "https://aresperu.com.pe/puertas/laminadas-terminadas/puertas-pet/" },
-            { imageIndex: 7, x: 1755.556, y: 2008.889, url: "https://aresperu.com.pe/puertas/laminadas-terminadas/puertas-pet/" }
-        ];
+        // Configuración del panorama
+        const source = Marzipano.ImageUrlSource.fromString(images[0]); // Carga la primera imagen como ejemplo
+        const geometry = new Marzipano.EquirectGeometry([{ width: 4000 }]); // Ajustar según tus imágenes
+        const limiter = Marzipano.RectilinearView.limit.traditional(1024, 100 * Math.PI / 180);
+        const view = new Marzipano.RectilinearView({ yaw: 0 }, limiter);
+        const scene = viewer.createScene({ source, geometry, view });
 
-        let currentIndex = 0;
-        const viewer = document.getElementById('viewer');
-        const panorama = document.getElementById('panorama');
+        scene.switchTo();
 
-        function updateHotspots() {
-            document.querySelectorAll('.hotspot').forEach(hotspot => hotspot.remove());
-
-            hotspots.forEach(hotspot => {
-                if (hotspot.imageIndex === currentIndex) {
-                    const spot = document.createElement('div');
-                    spot.className = 'hotspot';
-                    spot.style.left = `${(hotspot.x / 4000) * 100}%`;
-                    spot.style.top = `${(hotspot.y / 2000) * 100}%`;
-                    spot.onclick = () => window.open(hotspot.url, '_blank');
-                    viewer.appendChild(spot);
-                }
-            });
-        }
-
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'ArrowRight') {
-                currentIndex = (currentIndex + 1) % images.length;
-            } else if (event.key === 'ArrowLeft') {
-                currentIndex = (currentIndex - 1 + images.length) % images.length;
-            }
-            panorama.src = images[currentIndex];
-            updateHotspots();
-        });
-
-        updateHotspots();
+        // Opcional: Añadir hotspots (basado en el XML)
+        const hotspotContainer = scene.hotspotContainer();
+        hotspotContainer.createHotspot(
+            document.createElement('div'), // Puedes estilizarlo
+            { yaw: 0, pitch: 0 }
+        );
     </script>
 </body>
 </html>
